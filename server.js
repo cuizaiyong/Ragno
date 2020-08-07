@@ -6,7 +6,7 @@ const cache = new Map();
 
 const app = http.createServer((req, res) => {
   const pathname = getPathname(req);
-  setHeader(res, 'content-type', pathname);
+  setHeader(res, 'content-type', matchContentType(pathname));
   if (isStatic(pathname)) {
     if (!isExist(pathname)) {
       res.end('404 Not Found');
@@ -44,18 +44,13 @@ function isStatic(pathname) {
     pathname.endsWith('.css')
   );
 }
-function setHeader(res, type, pathname) {
-  switch (type) {
-    case 'content-type':
-      setContentType(res, pathname);
-      break;
-    default:
-      break;
-  }
+function setHeader(res, key, value) {
+  return res.setHeader(key, value);
 }
 
-function setContentType(res, pathname) {
+function matchContentType(pathname) {
   let isJSON = true;
+  let type;
   const contentType = {
     '\\.js$': 'text/javascript;charset=utf-8',
     '\\.html$': 'text/html;charset=utf-8',
@@ -64,12 +59,13 @@ function setContentType(res, pathname) {
   };
   Object.keys(contentType).forEach((reg) => {
     if (new RegExp(reg).test(pathname)) {
-      res.setHeader('content-type', contentType[reg]);
+      type = contentType[reg];
       isJSON = false;
     }
   });
 
-  if (isJSON) res.setHeader('content-type', contentType.default);
+  if (isJSON) type = contentType.default;
+  return type;
 }
 
 function getPathname(req) {
