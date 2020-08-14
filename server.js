@@ -12,9 +12,9 @@ const app = http.createServer((req, res) => {
       res.end('404 Not Found');
       return;
     }
-    if (!cache.get(pathname)) {
-      cache.set(pathname, readFile(pathname, 'binary'));
-    }
+    // if (!cache.get(pathname)) {
+    cache.set(pathname, readFile(pathname, 'binary'));
+    // }
     const body = cache.get(pathname);
     res.write(body);
     res.end();
