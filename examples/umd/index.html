@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>UMD</title>
+  <script src="../../dist/panamera.js"></script>
+</head>
+<body>
+  <script>
+    const { create, use } = window.panamera;
+    // 中间件的注册一定要在create方法之前调用才能生效
+    // 中间件的执行顺序跟注册顺序保持一致
+    use((req, res) => {
+      req.use(config => {
+        // 请求配置处理
+        console.log(config);
+        return config;
+      }, e => {
+        // 请求错误处理
+        console.log(e);
+        return 400;
+      });
+      res.use(config => {
+        // 响应结果处理
+        console.log(config);
+        return config;
+      }, e => {
+        // 响应错误处理
+        console.log(e);
+        return 500;
+      })
+    });
+    // panamera本身是集成了一些通用配置，如果配置有重复，以用户配置为准
+    const ins = create({
+      baseURL: 'http://localhost:3002'
+    });
+
+    ins.get('/test').then(res => {
+      console.log(res);
+    })
+  </script>
+</body>
+</html>
